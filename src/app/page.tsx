@@ -1,21 +1,49 @@
-import { accountRules, trades } from "@/lib/data";
+"use client";
+
+import { useMemo, useState } from "react";
+import { accountRules, trades as initialTrades } from "@/lib/data";
 import {
   buildEquityCurve,
   calculatePerformanceStats,
   calculateRiskMetrics,
 } from "@/lib/calculations";
+import { Direction, Trade } from "@/lib/types";
 import { RiskBanner } from "@/components/RiskBanner";
 import { RiskGauge } from "@/components/RiskGauge";
 import { AccountOverview } from "@/components/AccountOverview";
 import { PerformanceStats } from "@/components/PerformanceStats";
 import { TradeLog } from "@/components/TradeLog";
 import { EquityCurve } from "@/components/EquityCurve";
+import { AddTradeForm } from "@/components/AddTradeForm";
 import { Card, CardHeader } from "@/components/ui/Card";
 
+let nextId = initialTrades.length + 1;
+
 export default function Home() {
-  const performance = calculatePerformanceStats(trades);
-  const risk = calculateRiskMetrics(trades, accountRules);
-  const equityCurve = buildEquityCurve(trades, accountRules.startingBalance);
+  const [trades, setTrades] = useState<Trade[]>(initialTrades);
+
+  const performance = useMemo(() => calculatePerformanceStats(trades), [trades]);
+  const risk = useMemo(
+    () => calculateRiskMetrics(trades, accountRules),
+    [trades]
+  );
+  const equityCurve = useMemo(
+    () => buildEquityCurve(trades, accountRules.startingBalance),
+    [trades]
+  );
+
+  const isModified = trades !== initialTrades;
+
+  function handleAddTrade(input: { asset: string; direction: Direction; pnl: number }) {
+    setTrades((prev) => [
+      ...prev,
+      { id: `t${nextId++}`, asset: input.asset, direction: input.direction, pnl: input.pnl },
+    ]);
+  }
+
+  function handleReset() {
+    setTrades(initialTrades);
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -27,7 +55,7 @@ export default function Home() {
             </div>
             <div>
               <p className="font-display font-semibold text-[14px] leading-none">
-                Tradescape
+                SunnyTrades
               </p>
               <p className="text-[11px] text-[var(--text-faint)] font-mono leading-none mt-1">
                 Trader Risk Dashboard
@@ -95,12 +123,18 @@ export default function Home() {
               <TradeLog trades={trades} />
             </div>
           </div>
+
+          <AddTradeForm
+            onAdd={handleAddTrade}
+            onReset={handleReset}
+            isModified={isModified}
+          />
         </div>
       </main>
 
       <footer className="border-t border-[var(--border-soft)] py-5">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-[12px] text-[var(--text-faint)] font-mono">
-          <span>Tradescape — Full Stack Developer Assignment</span>
+          <span>SunnyTrades — Full Stack Developer Assignment</span>
           <span>All figures derived from trade data · mock session</span>
         </div>
       </footer>

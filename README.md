@@ -1,4 +1,4 @@
-# Trader Risk Dashboard — Tradescape Assignment
+# Trader Risk Dashboard — SunnyTrades Assignment
 
 A dashboard that answers one question for a trader as fast as possible:
 **"Am I currently in danger of violating my account rules?"**
@@ -43,6 +43,10 @@ All numbers come from two files: `src/lib/data.ts` (the raw account rules + trad
 **One assumption worth flagging:** the assignment gives trades without timestamps, so the daily-loss calculation treats all five trades as happening within a single session/day — the simplest assumption that makes "daily loss limit" mean something concrete. This is called out directly in a code comment in `data.ts`.
 
 **Drawdown methodology:** I calculated drawdown from the account's *running peak balance*, not from the starting balance. With trailing-style risk rules (the kind most evaluation accounts actually use), that's the only definition that stays meaningful once an account has ever been in profit — measuring from the starting balance alone would show $0 drawdown here even though the account did pull back twice along the way. The equity curve makes this visible directly.
+
+### Proving it's not hardcoded: "Add a Trade"
+
+At the bottom of the dashboard there's a small form to add a new mock trade (asset, direction, P&L). Submitting it pushes into the same `trades` array every calculation function reads from — so the balance, P&L, win rate, both risk gauges, the risk status banner, the equity curve, and the trade log all recompute immediately, in the browser, with no page reload. A "Reset to session data" link brings back the original five trades. This isn't required by the brief, but it's the fastest way to demonstrate the "derive, don't hardcode" requirement live rather than asking someone to trust the code.
 
 ### Component structure
 

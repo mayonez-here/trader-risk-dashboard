@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Trader Risk Dashboard | Tradescape",
+  title: "Trader Risk Dashboard | SunnyTrades",
   description:
     "A trader risk dashboard showing account performance and rule-compliance at a glance.",
 };
